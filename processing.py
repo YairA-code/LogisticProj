@@ -1,6 +1,6 @@
 from collections import deque
 import heapq
-from models import Parcel, StandardParcel, ExpressParcel  # [cite: 2]
+from models import Parcel, StandardParcel, ExpressParcel
 
 def process_incoming_batch(batch_data):
     first_urgent, second_urgent, *regular_parcels = batch_data
