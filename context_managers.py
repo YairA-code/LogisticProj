@@ -1,27 +1,25 @@
-from models import Parcel
+from models import Vehicle, Driver
 
-class ParcelProcessingLock:
+class FleetDispatchSession:
 
-    def __init__(self, parcel: Parcel, mark_completed_on_success: bool = True):
-        self.parcel = parcel
-        self.mark_completed_on_success = mark_completed_on_success
 
-        self._original_status = parcel.status
+    def __init__(self, vehicle: Vehicle, driver: Driver):
+        self.vehicle = vehicle
+        self.driver = driver
 
-    def __enter__(self) -> Parcel:
+        self._original_driver = vehicle.assigned_driver
+        self._original_availability = driver.is_available
 
-        self.parcel.status = "Processing"
-        return self.parcel
+    def __enter__(self) -> Vehicle:
+
+        self.vehicle.assign_driver(self.driver)
+        return self.vehicle
 
     def __exit__(self, exc_type, exc_val, exc_tb) -> bool:
-
         if exc_type is not None:
 
-            self.parcel.status = self._original_status
-
+            self.vehicle.assigned_driver = self._original_driver
+            self.driver.is_available = self._original_availability
             return False
-
-        if self.mark_completed_on_success:
-            self.parcel.status = "In Transit"
 
         return False
