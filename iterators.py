@@ -1,8 +1,7 @@
-from models import Parcel,ExpressParcel
-from typing import Iterable, Iterator
+from typing import Iterable, Iterator, Dict, Any
+from models import Parcel, Vehicle
 
 class ParcelIterator:
-
     def __init__(self, parcels: list[Parcel]):
         self._parcels = parcels
         self._index = 0
@@ -11,19 +10,14 @@ class ParcelIterator:
         return self
 
     def __next__(self) -> Parcel:
-
         if self._index >= len(self._parcels):
             raise StopIteration
-
-
-        current_parcel = self._parcels[self._index]
+        item = self._parcels[self._index]
         self._index += 1
-        return current_parcel
-
+        return item
 
 class ParcelCollection:
-
-    def __init__(self, parcels: list[Parcel] = None):
+    def __init__(self, parcels: Iterable[Parcel] = None):
         self._parcels = list(parcels) if parcels else []
 
     def add(self, parcel: Parcel) -> None:
@@ -35,28 +29,21 @@ class ParcelCollection:
     def __len__(self) -> int:
         return len(self._parcels)
 
+def filter_active_vehicles(vehicles: Iterable[Vehicle]) -> Iterator[Vehicle]:
 
+    for vehicle in vehicles:
+        if vehicle.mechanical_status == "OK":
+            yield vehicle
 
+def build_available_fleet_pipeline(vehicles: Iterable[Vehicle]) -> Iterator[Dict[str, Any]]:
 
-def filter_pending_parcels(parcels: Iterable) -> Iterator:
-
-    for parcel in parcels:
-        if parcel.status == "Pending":
-            yield parcel
-
-
-def build_heavy_express_pipeline(parcels):
-    stage_1_express_only = (p for p in parcels if isinstance(p, ExpressParcel))
-
-    stage_2_heavy_only = (p for p in stage_1_express_only if p.weight > 1.5)
-
+    stage_1_ok = (v for v in vehicles if v.mechanical_status == "OK")
+    stage_2_unassigned = (v for v in stage_1_ok if v.assigned_driver is None)
     stage_3_summary = (
         {
-            "parcel_id": p.parcel_id,
-            "destination": p.destination,
-            "cost": p.calculate_cost()
+            "license_plate": v.license_plate,
+            "available_capacity_kg": v.max_weight_capacity
         }
-        for p in stage_2_heavy_only
+        for v in stage_2_unassigned
     )
-
     return stage_3_summary
