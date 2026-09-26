@@ -1,9 +1,7 @@
 import json
-from models import StandardParcel, ExpressParcel
-
+from models import Parcel
 
 class ParcelRepository:
-
     def __init__(self, filepath: str):
         self.filepath = filepath
 
@@ -23,28 +21,14 @@ class ParcelRepository:
                     raise ValueError(f"Line {line_number}: Invalid JSON format - {err}")
 
                 parcel_id = data_dict.get("id")
+                if not parcel_id:
+                    raise ValueError(f"Line {line_number}: Missing parcel 'id'")
                 if parcel_id in seen_ids:
-                    raise ValueError(f"Line {line_number}: Duplicate parcel_id found: '{parcel_id}'")
+                    raise ValueError(f"Line {line_number}: Duplicate parcel_id '{parcel_id}'")
                 seen_ids.add(parcel_id)
 
-                parcel_obj = self._instantiate_parcel(data_dict, line_number)
+                if "weight" in data_dict and data_dict["weight"] <= 0:
+                    raise ValueError(f"Line {line_number}: Weight must be > 0")
+
+                parcel_obj = Parcel.create_from_dict(data_dict)
                 yield parcel_obj
-
-    def _instantiate_parcel(self, data: dict, line_num: int):
-
-        required_keys = {"id", "type", "weight", "destination"}
-        missing_keys = required_keys - data.keys()
-        if missing_keys:
-            raise ValueError(f"Line {line_num}: Missing required fields: {missing_keys}")
-
-        if data["weight"] <= 0:
-            raise ValueError(f"Line {line_num}: Weight must be positive, got {data['weight']}")
-
-
-        parcel_type = data["type"].lower()
-        if parcel_type == "standard":
-            return StandardParcel.from_dict(data)
-        elif parcel_type == "express":
-            return ExpressParcel.from_dict(data)
-        else:
-            raise ValueError(f"Line {line_num}: Unsupported parcel type: '{parcel_type}'")#
