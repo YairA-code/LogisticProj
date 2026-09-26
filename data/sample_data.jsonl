@@ -1,0 +1,15 @@
+{"id": "P101", "type": "standard", "weight": 2.5, "destination": "Tel Aviv", "status": "Pending"}
+{"id": "P102", "type": "express", "weight": 1.2, "destination": "Haifa", "status": "Pending"}
+{"id": "P103", "type": "standard", "weight": 5.0, "destination": "Jerusalem", "status": "In Transit"}
+{"id": "P104", "type": "express", "weight": 3.8, "destination": "Beer Sheva", "status": "Pending"}
+{"id": "P105", "type": "standard", "weight": 0.8, "destination": "Tel Aviv", "status": "Delivered"}
+{"id": "P106", "type": "express", "weight": 4.5, "destination": "Herzliya", "status": "Pending"}
+{"id": "P107", "type": "standard", "weight": 6.2, "destination": "Netanya", "status": "Pending"}
+{"id": "P108", "type": "standard", "weight": 1.5, "destination": "Ramat Gan", "status": "Pending"}
+{"id": "P109", "type": "express", "weight": 2.1, "destination": "Tel Aviv", "status": "In Transit"}
+{"id": "P110", "type": "standard", "weight": 7.3, "destination": "Ashdod", "status": "Pending"}
+{"id": "P111", "type": "express", "weight": 0.5, "destination": "Eilat", "status": "Pending"}
+{"id": "P112", "type": "standard", "weight": 3.0, "destination": "Petah Tikva", "status": "Delivered"}
+{"id": "P113", "type": "standard", "weight": 4.2, "destination": "Haifa", "status": "Pending"}
+{"id": "P114", "type": "express", "weight": 1.9, "destination": "Tel Aviv", "status": "Pending"}
+{"id": "P115", "type": "standard", "weight": 8.0, "destination": "Holon", "status": "Pending"}
