@@ -1,0 +1,5 @@
+{"license_plate": "11-222-33", "max_weight_capacity": 120.0, "mechanical_status": "OK"}
+{"license_plate": "44-555-66", "max_weight_capacity": 80.0, "mechanical_status": "In Maintenance"}
+{"license_plate": "77-888-99", "max_weight_capacity": 200.0, "mechanical_status": "OK"}
+{"license_plate": "12-345-67", "max_weight_capacity": 50.0, "mechanical_status": "OK"}
+{"license_plate": "98-765-43", "max_weight_capacity": 150.0, "mechanical_status": "In Maintenance"}
