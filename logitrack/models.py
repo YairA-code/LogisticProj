@@ -14,6 +14,9 @@ class Driver:
         self.name = name
         self.is_available = is_available
 
+    def set_availability(self, status: bool) -> None:
+        self.is_available = bool(status)
+
     @classmethod
     def from_dict(cls, data: dict) -> "Driver":
         return cls(data["driver_id"], data["name"], data.get("is_available", True))
@@ -79,6 +82,13 @@ class Vehicle:
         if self.assigned_driver:
             self.assigned_driver.is_available = True
             self.assigned_driver = None
+
+    def send_to_maintenance(self) -> None:
+        self.release_driver()
+        self.mechanical_status = "In Maintenance"
+
+    def mark_as_repaired(self) -> None:
+        self.mechanical_status = "OK"
 
     def __str__(self) -> str:
         driver_str = f" | Driver: {self.assigned_driver.name}" if self.assigned_driver else ""

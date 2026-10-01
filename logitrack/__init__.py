@@ -21,12 +21,15 @@ from .processing import (
     DeliveryWaitlistQueue,
     PriorityDispatchQueue,
     ShipmentManagerDict,
-    generate_fleet_utilization_report,
     manage_destinations,
     process_incoming_batch,
     run_comprehensions,
     sort_parcels_collection,
     validate_fleet_data_relationships,
+)
+from .reports import (
+    detect_operational_anomalies,
+    generate_fleet_utilization_report,
 )
 from .repository import ParcelRepository, VehicleRepository
 
@@ -48,6 +51,7 @@ __all__ = [
     "sort_parcels_collection",
     "validate_fleet_data_relationships",
     "generate_fleet_utilization_report",
+    "detect_operational_anomalies",
     "ParcelIterator",
     "ParcelCollection",
     "filter_active_vehicles",
