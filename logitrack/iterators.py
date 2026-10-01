@@ -1,5 +1,9 @@
 from typing import Any, Iterable, Iterator
-from models import ExpressParcel, Parcel, Vehicle
+
+try:
+    from .models import ExpressParcel, Parcel, Vehicle
+except (ImportError, ValueError):
+    from models import ExpressParcel, Parcel, Vehicle
 
 
 class ParcelIterator:

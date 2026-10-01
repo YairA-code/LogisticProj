@@ -2,7 +2,10 @@ import json
 from pathlib import Path
 from typing import Iterator
 
-from .models import Parcel, Vehicle
+try:
+    from .models import Parcel, Vehicle
+except (ImportError, ValueError):
+    from models import Parcel, Vehicle
 
 
 class ParcelRepository:

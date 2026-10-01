@@ -1,4 +1,7 @@
-from models import Driver, Vehicle
+try:
+    from .models import Driver, Vehicle
+except (ImportError, ValueError):
+    from models import Driver, Vehicle
 
 
 class FleetDispatchSession:

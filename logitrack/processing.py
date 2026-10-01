@@ -2,7 +2,10 @@ from collections import deque
 import heapq
 from typing import Any
 
-from .models import Driver, Parcel, ShipmentOrder, Vehicle
+try:
+    from .models import Driver, Parcel, ShipmentOrder, Vehicle
+except (ImportError, ValueError):
+    from models import Driver, Parcel, ShipmentOrder, Vehicle
 
 
 def process_incoming_batch(batch_data: list[Parcel]) -> tuple[Parcel, Parcel, list[Parcel]]:

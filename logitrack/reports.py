@@ -1,6 +1,9 @@
 from typing import Any
 
-from .models import Driver, ShipmentOrder, Vehicle
+try:
+    from .models import Driver, ShipmentOrder, Vehicle
+except (ImportError, ValueError):
+    from models import Driver, ShipmentOrder, Vehicle
 
 
 def generate_fleet_utilization_report(
