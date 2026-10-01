@@ -1,4 +1,6 @@
 from models import Driver, Vehicle, Parcel, StandardParcel, ExpressParcel, ShipmentOrder
+from iterators import ParcelCollection, filter_active_vehicles, build_available_fleet_pipeline
+from context_managers import FleetDispatchSession
 
 
 def main():
@@ -52,6 +54,86 @@ def main():
     for p in order.parcels:
         print(f" - חבילה {p.parcel_id}: {p.status}")
 
+
+
+
+    print("--- 1. Iterators ---")
+    collection = ParcelCollection([
+        StandardParcel("P1", 2.0, "Tel Aviv"),
+        StandardParcel("P2", 3.0, "Haifa"),
+        StandardParcel("P3", 1.5, "Jerusalem")
+    ])
+
+    iter1 = iter(collection)
+    iter2 = iter(collection)
+
+    print(f"איטרטור 1 מתקדם: {next(iter1).parcel_id}")
+    print(f"איטרטור 2 מתקדם עצמאית: {next(iter2).parcel_id}")
+    print(f"איטרטור 1 מתקדם שוב: {next(iter1).parcel_id}")
+
+
+    print("\n--- 2. Generator ---")
+    vehicles = [
+        Vehicle("11-111", 100, "OK"),
+        Vehicle("22-222", 150, "In Maintenance"),
+        Vehicle("33-333", 200, "OK"),
+        Vehicle("44-444", 120, "OK")
+    ]
+
+
+    active_gen = filter_active_vehicles(vehicles)
+
+
+    first = next(active_gen)
+    print(f"קריאה ראשונה עם next: {first.license_plate}")
+
+
+    print("ממשיכים לעבור עם for מהמיקום שנעצרנו (ידלג על הרכב הראשון שהוצאנו):")
+    for v in active_gen:
+        print(f"  נשלף ב-for: {v.license_plate}")
+
+
+    print("מנסים לעבור עליו שוב (לא יודפס כלום כי הוא התרוקן):")
+    for v in active_gen:
+        print("  (השורה הזו לא תודפס לעולם)")
+
+
+    print("\n--- 3. Lazy Pipeline ---")
+    vehicles[0].assign_driver(Driver("D1", "Moshe"))
+
+    pipeline = build_available_fleet_pipeline(vehicles)
+
+
+    print(f"תוצאה 1: {next(pipeline)}")
+    print(f"תוצאה 2: {next(pipeline)}")
+    print("-> עצרנו! שאר הנתונים לא עובדו בזיכרון.")
+
+    print("\n--- 4. Context Manager ---")
+
+
+    v1 = Vehicle("99-999-99", 120.0, "OK")
+    d1 = Driver("D2", "Sara")
+
+    print(f"לפני הבלוק - האם הנהגת פנויה? {d1.is_available}")
+
+    try:
+
+        with FleetDispatchSession(v1, d1) as assigned_vehicle:
+            print(f"בתוך הבלוק - הנהגת {assigned_vehicle.assigned_driver.name} שויכה בהצלחה.")
+            print(f"האם הנהגת פנויה כרגע? {d1.is_available}")
+
+
+            print("מדמים שגיאה קריטית (למשל: משקל חורג בזמן העמסה)...")
+            raise ValueError("משקל חורג! מבטל את הנסיעה.")
+
+    except ValueError as e:
+
+        print(f"השגיאה נתפסה בחוץ: {e}")
+
+    print("\nאחרי היציאה מהבלוק (הוכחת Rollback):")
+
+    print(f"מי הנהג של הרכב עכשיו? {v1.assigned_driver}")
+    print(f"האם הנהגת חזרה להיות פנויה? {d1.is_available}")
 
 if __name__ == "__main__":
     main()
