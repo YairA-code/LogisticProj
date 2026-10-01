@@ -83,23 +83,38 @@ def main() -> None:
     print_header("3. Iterators, Generators & Lazy Pipeline (iterators.py)")
     sample_subset = all_parcels[:3]
     collection = ParcelCollection(sample_subset)
-    print(f"Iterating over custom ParcelCollection (length={len(collection)}):")
-    for idx, p in enumerate(collection, start=1):
-        print(f"  [{idx}] {p}")
+    print(f"ParcelCollection created with {len(collection)} parcels.")
 
-    print("\n[Generator: filter_active_vehicles]")
+    print("\n[Two Independent Iterators on Same Collection]")
+    it1 = iter(collection)
+    it2 = iter(collection)
+    print(f"  Iterator 1 (step 1): {next(it1)}")
+    print(f"  Iterator 2 (step 1): {next(it2)}")
+    print(f"  Iterator 1 (step 2): {next(it1)}")
+    print(f"  Iterator 2 (step 2 - independent): {next(it2)}")
+
+    print("\n[Generator with yield: filter_active_vehicles]")
     v_repo = VehicleRepository(vehicles_file)
     fleet = list(v_repo.load_vehicles())
-    active_vehicles = list(filter_active_vehicles(fleet))
-    print(f"  Active vehicles in operational status: {len(active_vehicles)} of {len(fleet)}")
-    for v in active_vehicles:
+    gen = filter_active_vehicles(fleet)
+    print("  Created generator object without processing all data yet.")
+    first_active = next(gen)
+    print(f"  Single call via next(): {first_active.license_plate} (resumed state)")
+    print("  Continuing iteration via for loop:")
+    for v in gen:
         print(f"   - {v.license_plate} (Capacity: {v.max_weight_capacity}kg)")
+    print("  Verifying generator exhaustion:")
+    exhausted_items = list(gen)
+    print(f"  Items left in exhausted generator: {len(exhausted_items)} (requires creating a new generator)")
 
     print("\n[Lazy Pipeline: build_available_fleet_pipeline]")
     pipeline = build_available_fleet_pipeline(fleet)
-    print("  Consuming pipeline stages lazily (on-demand):")
-    for item in pipeline:
-        print(f"   - Pipeline yield: Plate={item['license_plate']}, Available Cap={item['available_capacity_kg']}kg")
+    print("  Consuming ONLY first 2 results and stopping (per rubric):")
+    res1 = next(pipeline)
+    print(f"  [1] Plate={res1['license_plate']}, Capacity={res1['available_capacity_kg']}kg")
+    res2 = next(pipeline)
+    print(f"  [2] Plate={res2['license_plate']}, Capacity={res2['available_capacity_kg']}kg")
+    print("  Pipeline execution halted: subsequent items were never evaluated.")
 
     print_header("4. Collections Processing, Comprehensions & Sorting (processing.py)")
 
@@ -174,7 +189,7 @@ def main() -> None:
     print(f"Created Shipment Order: {order}")
     print(f"Total Weight: {order.total_weight:.2f} kg | Total Cost: {order.total_cost:.2f} ILS")
 
-    dispatch_vehicle = active_vehicles[0]
+    dispatch_vehicle = next(filter_active_vehicles(fleet))
     dispatch_driver = Driver(driver_id="D500", name="Dan", is_available=True)
     dispatch_vehicle.assign_driver(dispatch_driver)
 

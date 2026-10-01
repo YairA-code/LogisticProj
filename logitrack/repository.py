@@ -42,7 +42,7 @@ class ParcelRepository:
                 if "weight" in data_dict and data_dict["weight"] <= 0:
                     raise ValueError(f"Line {line_number}: Weight must be > 0")
 
-                parcel_obj = Parcel.create_from_dict(data_dict)
+                parcel_obj = Parcel.from_dict(data_dict)
                 yield parcel_obj
 
     def find_by_id(self, parcel_id: str) -> Parcel | None:
@@ -75,10 +75,6 @@ class VehicleRepository:
                     continue
                 try:
                     data = json.loads(clean_line)
-                    yield Vehicle(
-                        license_plate=data["license_plate"],
-                        max_weight_capacity=data["max_weight_capacity"],
-                        mechanical_status=data.get("mechanical_status", "OK"),
-                    )
+                    yield Vehicle.from_dict(data)
                 except Exception as err:
                     raise ValueError(f"Line {line_number}: Invalid vehicle record - {err}")

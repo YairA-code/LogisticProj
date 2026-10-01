@@ -38,6 +38,14 @@ class Vehicle:
         self.mechanical_status = mechanical_status
         self.assigned_driver: Driver | None = None
 
+    @classmethod
+    def from_dict(cls, data: dict) -> "Vehicle":
+        return cls(
+            license_plate=data["license_plate"],
+            max_weight_capacity=data["max_weight_capacity"],
+            mechanical_status=data.get("mechanical_status", "OK"),
+        )
+
     @property
     def max_weight_capacity(self) -> float:
         return self._max_weight_capacity
@@ -120,17 +128,26 @@ class Parcel(ABC):
         """Calculate and return delivery cost (polymorphic across parcel types)."""
         pass
 
-    @staticmethod
-    def create_from_dict(data: dict) -> "Parcel":
+    @classmethod
+    def from_dict(cls, data: dict) -> "Parcel":
         parcel_type = data.get("type", "standard").lower()
         if parcel_type == "express":
             return ExpressParcel(data["id"], data["weight"], data["destination"], data.get("status", "Pending"))
         return StandardParcel(data["id"], data["weight"], data["destination"], data.get("status", "Pending"))
 
+    @staticmethod
+    def create_from_dict(data: dict) -> "Parcel":
+        return Parcel.from_dict(data)
+
     def __eq__(self, other: object) -> bool:
         if isinstance(other, Parcel):
             return self.parcel_id == other.parcel_id
         return False
+
+    def __lt__(self, other: object) -> bool:
+        if isinstance(other, Parcel):
+            return self.weight < other.weight
+        return NotImplemented
 
     def __hash__(self) -> int:
         return hash(self.parcel_id)
@@ -148,12 +165,20 @@ class StandardParcel(Parcel):
     def calculate_cost(self) -> float:
         return self.weight * 15.0
 
+    @classmethod
+    def from_dict(cls, data: dict) -> "StandardParcel":
+        return cls(data["id"], data["weight"], data["destination"], data.get("status", "Pending"))
+
 
 class ExpressParcel(Parcel):
     """Express shipping parcel with express surcharge."""
 
     def calculate_cost(self) -> float:
         return (self.weight * 15.0) + 50.0
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "ExpressParcel":
+        return cls(data["id"], data["weight"], data["destination"], data.get("status", "Pending"))
 
 
 class ShipmentOrder:
@@ -165,6 +190,13 @@ class ShipmentOrder:
         self.order_id = order_id
         self.parcels: list[Parcel] = []
         self.assigned_vehicle: Vehicle | None = None
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "ShipmentOrder":
+        order = cls(data["order_id"])
+        for p_data in data.get("parcels", []):
+            order.add_parcel(Parcel.from_dict(p_data))
+        return order
 
     def add_parcel(self, parcel: Parcel) -> None:
         if parcel in self.parcels:
