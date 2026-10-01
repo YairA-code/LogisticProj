@@ -13,3 +13,6 @@
 {"id": "P113", "type": "standard", "weight": 4.2, "destination": "Haifa", "status": "Pending"}
 {"id": "P114", "type": "express", "weight": 1.9, "destination": "Tel Aviv", "status": "Pending"}
 {"id": "P115", "type": "standard", "weight": 8.0, "destination": "Holon", "status": "Pending"}
+{"id": "P116", "type": "express", "weight": 2.7, "destination": "Rishon LeZion", "status": "Pending"}
+{"id": "P117", "type": "standard", "weight": 11.4, "destination": "Tel Aviv", "status": "Pending"}
+{"id": "P118", "type": "express", "weight": 5.6, "destination": "Jerusalem", "status": "In Transit"}
