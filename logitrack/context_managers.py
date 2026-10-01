@@ -1,4 +1,4 @@
-from .models import Driver, Vehicle
+from models import Driver, Vehicle
 
 
 class FleetDispatchSession:
