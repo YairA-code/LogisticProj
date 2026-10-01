@@ -83,3 +83,19 @@ Daily Fleet Dispatch (Fleet Manager): The fleet manager reviews the list of vehi
 **Future Expansion Idea**
 
 Connecting the system to a real map API (like Google Maps API) to calculate real driving distances, optimize delivery routes for the assigned vehicles, and provide customers with live ETAs.
+
+**Lazy Processing Pipeline (Generator Expressions)**
+
+As part of the fleet management dispatch process, we implemented a 3-stage lazy pipeline to filter and process vehicles.
+
+* **What triggers the pipeline to start working?** 
+  The pipeline is completely lazy and performs no computation upon creation. It only starts working when data is explicitly requested and pulled, such as by calling the `next()` function or iterating through it with a `for` loop.
+
+* **Which items were not processed after stopping?** 
+  Since we consumed only the first two results and then stopped, the remaining vehicles in the dataset were never evaluated by the pipeline's conditions. This saved both memory and CPU time.
+
+* **List Comprehension vs. Generator Expression in our case:** 
+  If we had used list comprehensions, Python would have created and stored complete intermediate lists in the computer's memory for every single filtering stage. By using generator expressions, each vehicle passes through all the pipeline stages one by one, completely avoiding the creation of any intermediate lists.
+
+* **Why create a new Generator for a second pass?** 
+  Generators maintain an internal state (a cursor) and are exhausted as they are consumed—they only move forward. Once a generator is consumed, it cannot be reset or rewound. Therefore, a new generator instance must be created to iterate over the data from the beginning.
