@@ -6,7 +6,6 @@ from .models import Driver, ShipmentOrder, Vehicle
 def generate_fleet_utilization_report(
     vehicles: list[Vehicle], shipments: list[ShipmentOrder]
 ) -> dict[str, Any]:
-    """Generates an operational decision-support report on fleet capacity, maintenance status, and payload utilization."""
     total_vehicles = len(vehicles)
     if total_vehicles == 0:
         return {"status": "No vehicles available"}
@@ -41,11 +40,6 @@ def detect_operational_anomalies(
     valid_vehicles: list[Vehicle],
     valid_drivers: list[Driver],
 ) -> list[str]:
-    """Checks data relationships and referential integrity between shipments, vehicles, and drivers.
-
-    Detects anomalies such as non-existent vehicles, unregistered drivers,
-    weight capacity violations, or assigning drivers to disabled vehicles.
-    """
     anomalies = []
     valid_vehicle_plates = {v.license_plate for v in valid_vehicles}
     valid_driver_ids = {d.driver_id for d in valid_drivers}

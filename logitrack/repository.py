@@ -6,16 +6,10 @@ from .models import Parcel, Vehicle
 
 
 class ParcelRepository:
-    """Repository for loading and querying parcels from a JSONL file."""
-
     def __init__(self, filepath: str | Path):
         self.filepath = Path(filepath)
 
     def load_parcels(self) -> Iterator[Parcel]:
-        """Lazy generator that reads sample_data.jsonl line-by-line, converts dicts to Parcel instances,
-
-        and yields them. Enforces ID uniqueness and field validation.
-        """
         if not self.filepath.exists():
             raise FileNotFoundError(f"Data file not found at: {self.filepath}")
 
@@ -46,25 +40,20 @@ class ParcelRepository:
                 yield parcel_obj
 
     def find_by_id(self, parcel_id: str) -> Parcel | None:
-        """Finds and returns a Parcel object by its unique ID. Returns None if not found."""
         for parcel in self.load_parcels():
             if parcel.parcel_id == parcel_id:
                 return parcel
         return None
 
     def get_all(self) -> list[Parcel]:
-        """Loads and returns all parcels as a list."""
         return list(self.load_parcels())
 
 
 class VehicleRepository:
-    """Repository for loading vehicle records from JSONL."""
-
     def __init__(self, filepath: str | Path):
         self.filepath = Path(filepath)
 
     def load_vehicles(self) -> Iterator[Vehicle]:
-        """Lazy generator that reads vehicles JSONL line-by-line."""
         if not self.filepath.exists():
             raise FileNotFoundError(f"Vehicle data file not found at: {self.filepath}")
 

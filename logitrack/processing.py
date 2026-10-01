@@ -6,7 +6,6 @@ from .models import Driver, Parcel, ShipmentOrder, Vehicle
 
 
 def process_incoming_batch(batch_data: list[Parcel]) -> tuple[Parcel, Parcel, list[Parcel]]:
-    """Demonstrates tuple unpacking: extracts first two urgent parcels and collects the rest."""
     if len(batch_data) < 2:
         raise ValueError("Batch must contain at least 2 parcels.")
     first_urgent, second_urgent, *regular_parcels = batch_data
@@ -14,7 +13,6 @@ def process_incoming_batch(batch_data: list[Parcel]) -> tuple[Parcel, Parcel, li
 
 
 def manage_destinations(parcels: list[Parcel], restricted_destinations: list[str] | None = None) -> dict[str, Any]:
-    """Demonstrates set operations: set comprehension, add, discard, membership, union, and intersection."""
     restricted_destinations = restricted_destinations or ["Border Zone", "Hazard Area", "Jerusalem"]
     destinations = {p.destination for p in parcels}
     restricted_set = set(restricted_destinations)
@@ -34,8 +32,6 @@ def manage_destinations(parcels: list[Parcel], restricted_destinations: list[str
 
 
 class ShipmentManagerDict:
-    """Manages parcel lookups and status counts using dictionaries."""
-
     def __init__(self, parcels: list[Parcel]):
         self.parcel_by_id: dict[str, Parcel] = {}
         self.status_counts: dict[str, int] = {}
@@ -53,8 +49,6 @@ class ShipmentManagerDict:
 
 
 class DeliveryWaitlistQueue:
-    """Demonstrates FIFO queue processing using collections.deque."""
-
     def __init__(self):
         self.queue: deque[Parcel] = deque()
 
@@ -74,14 +68,11 @@ class DeliveryWaitlistQueue:
 
 
 class PriorityDispatchQueue:
-    """Demonstrates priority queue ordering using heapq."""
-
     def __init__(self):
         self.heap: list[tuple[int, int, Parcel]] = []
         self.counter = 0
 
     def add_parcel_with_priority(self, parcel: Parcel, priority_level: int) -> None:
-        """Adds a parcel where lower priority_level indicates higher urgency (e.g. 1=Express, 2=Standard)."""
         self.counter += 1
         heapq.heappush(self.heap, (priority_level, self.counter, parcel))
 
@@ -96,7 +87,6 @@ class PriorityDispatchQueue:
 
 
 def run_comprehensions(parcels: list[Parcel]) -> tuple[list[Parcel], set[str], dict[str, float]]:
-    """Demonstrates List, Set, and Dict comprehensions."""
     heavy_parcels = [p for p in parcels if p.weight > 3.0]
     unique_statuses = {p.status for p in parcels}
     id_to_weight = {p.parcel_id: p.weight for p in parcels}
@@ -106,8 +96,6 @@ def run_comprehensions(parcels: list[Parcel]) -> tuple[list[Parcel], set[str], d
 def sort_parcels_collection(
     parcels: list[Parcel],
 ) -> tuple[list[Parcel], list[Parcel], list[Parcel]]:
-    """Demonstrates sorting by named function, lambda, and multi-key tuple."""
-
     def get_parcel_weight(p: Parcel) -> float:
         return p.weight
 
@@ -122,7 +110,6 @@ def validate_fleet_data_relationships(
     valid_vehicles: list[Vehicle],
     valid_drivers: list[Driver],
 ) -> list[str]:
-    """Validates referential integrity between shipments, vehicles, and drivers."""
     anomalies = []
     valid_vehicle_plates = {v.license_plate for v in valid_vehicles}
     valid_driver_ids = {d.driver_id for d in valid_drivers}
@@ -148,7 +135,6 @@ def validate_fleet_data_relationships(
 
 
 def generate_fleet_utilization_report(vehicles: list[Vehicle], shipments: list[ShipmentOrder]) -> dict[str, Any]:
-    """Generates an operational decision-support report on fleet capacity and utilization."""
     total_vehicles = len(vehicles)
     if total_vehicles == 0:
         return {"status": "No vehicles available"}

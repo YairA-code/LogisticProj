@@ -2,8 +2,6 @@ from abc import ABC, abstractmethod
 
 
 class Driver:
-    """Represents a delivery driver."""
-
     def __init__(self, driver_id: str, name: str, is_available: bool = True):
         if not driver_id or not isinstance(driver_id, str):
             raise ValueError("Driver ID must be a non-empty string.")
@@ -30,8 +28,6 @@ class Driver:
 
 
 class Vehicle:
-    """Represents a fleet vehicle used for deliveries."""
-
     def __init__(self, license_plate: str, max_weight_capacity: float, mechanical_status: str = "OK"):
         if not license_plate or not isinstance(license_plate, str):
             raise ValueError("License plate must be a non-empty string.")
@@ -99,8 +95,6 @@ class Vehicle:
 
 
 class Parcel(ABC):
-    """Abstract base class for all parcels."""
-
     def __init__(self, parcel_id: str, weight: float, destination: str, status: str = "Pending"):
         if not parcel_id or not isinstance(parcel_id, str):
             raise ValueError("Parcel ID must be a non-empty string.")
@@ -135,7 +129,6 @@ class Parcel(ABC):
 
     @abstractmethod
     def calculate_cost(self) -> float:
-        """Calculate and return delivery cost (polymorphic across parcel types)."""
         pass
 
     @classmethod
@@ -170,8 +163,6 @@ class Parcel(ABC):
 
 
 class StandardParcel(Parcel):
-    """Standard shipping parcel with base pricing per kg."""
-
     def calculate_cost(self) -> float:
         return self.weight * 15.0
 
@@ -181,8 +172,6 @@ class StandardParcel(Parcel):
 
 
 class ExpressParcel(Parcel):
-    """Express shipping parcel with express surcharge."""
-
     def calculate_cost(self) -> float:
         return (self.weight * 15.0) + 50.0
 
@@ -192,8 +181,6 @@ class ExpressParcel(Parcel):
 
 
 class ShipmentOrder:
-    """Represents a grouped order composed of multiple parcels dispatched together."""
-
     def __init__(self, order_id: str):
         if not order_id or not isinstance(order_id, str):
             raise ValueError("Order ID must be a non-empty string.")

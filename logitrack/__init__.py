@@ -1,5 +1,3 @@
-"""LogiTrack - Logistics & Delivery Management System."""
-
 from .context_managers import FleetDispatchSession
 from .iterators import (
     ParcelCollection,

@@ -1,10 +1,3 @@
-"""Main Demonstration Script for LogiTrack Logistics Management System.
-
-This script executes the complete end-to-end operational scenario.
-Per project requirements, NO business classes are defined here;
-all components are imported from the logitrack package.
-"""
-
 from pathlib import Path
 
 from logitrack import (
