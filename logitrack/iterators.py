@@ -1,6 +1,5 @@
 from typing import Any, Iterable, Iterator
-
-from .models import ExpressParcel, Parcel, Vehicle
+from models import ExpressParcel, Parcel, Vehicle
 
 
 class ParcelIterator:
