@@ -43,9 +43,6 @@ def main() -> None:
 
     print_header("LogiTrack Logistics System - Full Demonstration")
 
-    # -------------------------------------------------------------------------
-    # 1. DATA REPOSITORY: Lazy Loading & Find by ID
-    # -------------------------------------------------------------------------
     print_header("1. Data Repository & Lazy Loading (repository.py)")
     repo = ParcelRepository(parcels_file)
     print(f"Loading parcels from: {parcels_file.relative_to(base_dir)}")
@@ -62,9 +59,6 @@ def main() -> None:
     not_found = repo.find_by_id(missing_id)
     print(f" - Searching for '{missing_id}': Result -> {not_found}")
 
-    # -------------------------------------------------------------------------
-    # 2. BUSINESS MODELS: Inheritance, Polymorphism & Validation
-    # -------------------------------------------------------------------------
     print_header("2. Business Models, Polymorphism & Validation (models.py)")
     driver1 = Driver(driver_id="D101", name="Yair")
     driver2 = Driver(driver_id="D102", name="Liem")
@@ -86,9 +80,6 @@ def main() -> None:
     print(f"  StandardParcel (10kg): {sp.calculate_cost()} ILS (rate: 15/kg)")
     print(f"  ExpressParcel  (10kg): {ep.calculate_cost()} ILS (rate: 15/kg + 50 surcharge)")
 
-    # -------------------------------------------------------------------------
-    # 3. ITERABLES, ITERATORS, GENERATORS & LAZY PIPELINES
-    # -------------------------------------------------------------------------
     print_header("3. Iterators, Generators & Lazy Pipeline (iterators.py)")
     sample_subset = all_parcels[:3]
     collection = ParcelCollection(sample_subset)
@@ -110,9 +101,6 @@ def main() -> None:
     for item in pipeline:
         print(f"   - Pipeline yield: Plate={item['license_plate']}, Available Cap={item['available_capacity_kg']}kg")
 
-    # -------------------------------------------------------------------------
-    # 4. PROCESSING: Collections, Comprehensions & Sorting
-    # -------------------------------------------------------------------------
     print_header("4. Collections Processing, Comprehensions & Sorting (processing.py)")
 
     print("[Tuple Unpacking: process_incoming_batch]")
@@ -141,9 +129,9 @@ def main() -> None:
 
     print("\n[Priority Queue (heapq) vs FIFO Queue (deque)]")
     pq = PriorityDispatchQueue()
-    pq.add_parcel_with_priority(all_parcels[0], priority_level=2)  # Standard
-    pq.add_parcel_with_priority(all_parcels[1], priority_level=1)  # Express
-    pq.add_parcel_with_priority(all_parcels[3], priority_level=1)  # Express
+    pq.add_parcel_with_priority(all_parcels[0], priority_level=2)
+    pq.add_parcel_with_priority(all_parcels[1], priority_level=1)
+    pq.add_parcel_with_priority(all_parcels[3], priority_level=1)
     print(f"  Popped highest priority parcel: {pq.pop_next_urgent_parcel()}")
 
     fifo = DeliveryWaitlistQueue()
@@ -151,9 +139,6 @@ def main() -> None:
     fifo.add_parcel(all_parcels[1])
     print(f"  Popped FIFO parcel: {fifo.process_next_parcel()}")
 
-    # -------------------------------------------------------------------------
-    # 5. CUSTOM CONTEXT MANAGER: Transactional Driver Assignment & Rollback
-    # -------------------------------------------------------------------------
     print_header("5. Context Manager & Transaction Rollback (context_managers.py)")
     test_vehicle = Vehicle(license_plate="99-888-77", max_weight_capacity=200.0, mechanical_status="OK")
     test_driver = Driver(driver_id="D999", name="Eitan", is_available=True)
@@ -181,9 +166,6 @@ def main() -> None:
     print(f"  Vehicle driver: {test_vehicle.assigned_driver} (restored)")
     print(f"  Driver available: {test_driver.is_available} (restored)")
 
-    # -------------------------------------------------------------------------
-    # 6. BUSINESS ACTIONS: Shipment Dispatch & Management Report
-    # -------------------------------------------------------------------------
     print_header("6. Business Actions & Fleet Utilization Report")
     order = ShipmentOrder(order_id="ORD-2026-001")
     for p in all_parcels[:4]:

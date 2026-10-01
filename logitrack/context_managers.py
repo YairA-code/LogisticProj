@@ -23,8 +23,7 @@ class FleetDispatchSession:
     def __exit__(self, exc_type, exc_val, exc_tb) -> bool:
         """Roll back driver and vehicle assignments if an error occurred inside the block."""
         if exc_type is not None:
-            # Transaction failed: Rollback to previous state
             self.vehicle.assigned_driver = self._original_driver
             self.driver.is_available = self._original_availability
-            return False  # Propagate exception
+            return False
         return False
