@@ -71,6 +71,8 @@ class Vehicle:
             raise ValueError("Cannot assign a driver to a vehicle in maintenance.")
         if not driver.is_available:
             raise ValueError(f"Driver {driver.name} is currently not available.")
+        if self.assigned_driver is not None:
+            self.assigned_driver.is_available = True
         self.assigned_driver = driver
         driver.is_available = False
 
@@ -136,7 +138,10 @@ class Parcel(ABC):
         parcel_type = data.get("type", "standard").lower()
         if parcel_type == "express":
             return ExpressParcel(data["id"], data["weight"], data["destination"], data.get("status", "Pending"))
-        return StandardParcel(data["id"], data["weight"], data["destination"], data.get("status", "Pending"))
+        elif parcel_type == "standard":
+            return StandardParcel(data["id"], data["weight"], data["destination"], data.get("status", "Pending"))
+        else:
+            raise ValueError(f"Invalid parcel type: '{parcel_type}'. Must be 'standard' or 'express'.")
 
     @staticmethod
     def create_from_dict(data: dict) -> "Parcel":

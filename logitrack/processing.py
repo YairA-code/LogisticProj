@@ -17,22 +17,20 @@ def process_incoming_batch(batch_data: list[Parcel]) -> tuple[Parcel, Parcel, li
 
 def manage_destinations(parcels: list[Parcel], restricted_destinations: list[str] | None = None) -> dict[str, Any]:
     restricted_destinations = restricted_destinations or ["Border Zone", "Hazard Area", "Jerusalem"]
-    destinations = {p.destination for p in parcels}
+    destinations = {
+        p.destination for p in parcels
+        if p.destination and p.destination != "Unknown_Destination"
+    }
     restricted_set = set(restricted_destinations)
-
-    destinations.add("Jerusalem")
-    destinations.discard("Unknown_Destination")
     has_tel_aviv = "Tel Aviv" in destinations
     union_result = destinations.union(restricted_set)
     intersection_result = destinations.intersection(restricted_set)
-
     return {
         "destinations": destinations,
         "has_tel_aviv": has_tel_aviv,
         "union": union_result,
         "intersection": intersection_result,
     }
-
 
 class ShipmentManagerDict:
     def __init__(self, parcels: list[Parcel]):

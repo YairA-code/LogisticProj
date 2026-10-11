@@ -154,6 +154,7 @@ def main() -> None:
     fifo = DeliveryWaitlistQueue()
     fifo.add_parcel(all_parcels[0])
     fifo.add_parcel(all_parcels[1])
+    fifo.add_parcel(all_parcels[2])
     print(f"  Popped FIFO parcel: {fifo.process_next_parcel()}")
 
     print_header("5. Context Manager & Transaction Rollback (context_managers.py)")
