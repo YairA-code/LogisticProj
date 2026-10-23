@@ -52,3 +52,7 @@ Thumbs.db
 .coverage
 htmlcov/
 .mypy_cache/
+
+# Environment variables and secrets
+.env
+.env.*

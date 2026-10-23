@@ -43,6 +43,7 @@ def main() -> None:
     parcels_file = base_dir / "data" / "sample_data.jsonl"
     vehicles_file = base_dir / "data" / "vehicles_data.jsonl"
 
+
     print_header("LogiTrack Logistics System - Full Demonstration")
 
     print_header("1. Data Repository & Lazy Loading (repository.py)")
