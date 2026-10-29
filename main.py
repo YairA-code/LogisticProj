@@ -66,7 +66,9 @@ def main() -> None:
         print(f"  {key}: {value}")
 
     print(f"\nDelayed Shipments Recorded by Observer: {delay_observer.delayed_shipments_count}")
-    print(f"Driver Safety Warning Flag: {driver.has_safety_warning}")
+
+    driver_warning = getattr(driver, 'has_safety_warning', True)
+    print(f"Driver Safety Warning Flag: {driver_warning}")
 
     print_header("4. Integrated Fleet and Weather Report")
     report = generate_integrated_fleet_report(
