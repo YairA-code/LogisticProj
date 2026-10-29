@@ -1,6 +1,7 @@
 import logging
 from typing import List, Protocol
 from dataclasses import dataclass
+from strategy import ExtremeWeatherPricingStrategy, WeatherAdjustedCapacityStrategy
 
 from logitrack.api_client import WeatherApiClient
 from logitrack.models import Vehicle, Driver, ShipmentOrder
