@@ -34,7 +34,7 @@ from .processing import (
 )
 from .reports import (
     detect_operational_anomalies,
-    generate_fleet_utilization_report,
+    generate_integrated_fleet_report,
 )
 from .repository import ParcelRepository, VehicleRepository
 
@@ -55,7 +55,7 @@ __all__ = [
     "run_comprehensions",
     "sort_parcels_collection",
     "validate_fleet_data_relationships",
-    "generate_fleet_utilization_report",
+    "generate_integrated_fleet_report",
     "detect_operational_anomalies",
     "ParcelIterator",
     "ParcelCollection",

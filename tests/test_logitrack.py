@@ -9,7 +9,7 @@ from logitrack.observer import FleetSafetyObserver, DelayStatisticsObserver
 from logitrack.services import WeatherShippingService
 from logitrack.async_processing import gather_weather_for_destinations
 from logitrack.threaded_processing import FleetResourceManager
-from logitrack.reports import generate_fleet_utilization_report
+from logitrack.reports import generate_integrated_fleet_report
 
 
 def test_standard_parcel_cost():
@@ -115,7 +115,7 @@ def test_weather_adjusted_capacity_extreme():
 
 def test_fleet_safety_observer_notified():
     observer = FleetSafetyObserver()
-    with patch("logitrack.observers.logger.warning") as mock_logger:
+    with patch("logitrack.observer.logger.warning") as mock_logger:
         observer.update("HIGH_WIND_WARNING", {"vehicle": Vehicle("11-222-33", 100.0), "windspeed": 45.0})
         mock_logger.assert_called_once()
 
@@ -131,19 +131,22 @@ def test_weather_shipping_service_fallback(mock_fetch):
     service = WeatherShippingService()
     order = ShipmentOrder("O1")
     vehicle = Vehicle("11-222-33", 100.0)
-    result = service.evaluate_shipment_weather_conditions(order, vehicle, 32.0, 34.0)
+
+    result = service.evaluate_shipment(order, vehicle, 32.0, 34.0)
+
     assert result["fallback_mode"] is True
     assert result["is_weight_safe"] is True
 
 
-@pytest.mark.asyncio
-async def test_async_weather_fetch_order():
+def test_async_weather_fetch_order():
     destinations = [
         {"city": "Tel Aviv", "lat": 32.08, "lon": 34.78},
         {"city": "Haifa", "lat": 32.79, "lon": 34.98},
         {"city": "Eilat", "lat": 29.55, "lon": 34.95}
     ]
-    results = await gather_weather_for_destinations(destinations)
+
+    results = asyncio.run(gather_weather_for_destinations(destinations))
+
     assert len(results) == 3
     assert results[0]["destination"] == "Tel Aviv"
     assert results[1]["destination"] == "Haifa"
@@ -178,7 +181,7 @@ def test_integrated_fleet_report_generation():
 
     evaluations = [{"windspeed": 40.0}]
 
-    report = generate_fleet_utilization_report(vehicles, [order], evaluations)
+    report = generate_integrated_fleet_report(vehicles, [order], evaluations)
     assert report["total_vehicles"] == 2
     assert report["active_vehicles"] == 1
     assert report["weather_affected_shipments_count"] == 1

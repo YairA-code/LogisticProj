@@ -99,13 +99,10 @@ class WeatherDispatchService:
             order.total_cost = pricing_strategy.calculate_cost(order.total_cost)
 
             self._notify_severe_weather(vehicle, driver, dest_name)
-
         else:
-
             pricing_strategy = NormalWeatherPricing()
-            order.total_
-
-
+            order.total_cost = pricing_strategy.calculate_cost(order.total_cost)
+            return True
 
 class WeatherShippingService:
     def __init__(self, api_client=None, capacity_strategy=None, pricing_strategy=None):
@@ -121,8 +118,14 @@ class WeatherShippingService:
         for obs in self._observers:
             obs.update(event_type, data)
 
-    def evaluate_shipment(self, shipment, vehicle, latitude, longitude):
-        weather_data = self._fetch_weather_safe(latitude, longitude)
+    def evaluate_shipment(self, shipment: ShipmentOrder, vehicle: Vehicle, latitude: float, longitude: float):
+        weather_data = None
+        try:
+            raw_response = self.api_client.fetch_weather(latitude, longitude)
+            weather_data = raw_response.get("current_weather", {})
+        except Exception:
+            weather_data = {"temperature": 20.0, "windspeed": 0.0, "weathercode": 0, "fallback": True}
+
         windspeed = weather_data.get("windspeed", 0.0)
 
         effective_capacity = self.capacity_strategy.calculate_effective_capacity(vehicle, weather_data)
@@ -140,5 +143,6 @@ class WeatherShippingService:
             "order_id": shipment.order_id,
             "final_cost": final_cost,
             "effective_capacity": effective_capacity,
-            "is_weight_safe": is_weight_safe
+            "is_weight_safe": is_weight_safe,
+            "fallback_mode": weather_data.get("fallback", False)
         }

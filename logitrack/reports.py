@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Dict, List
 
 try:
     from .models import Driver, ShipmentOrder, Vehicle
@@ -6,32 +6,53 @@ except (ImportError, ValueError):
     from models import Driver, ShipmentOrder, Vehicle
 
 
-def generate_fleet_utilization_report(
-    vehicles: list[Vehicle], shipments: list[ShipmentOrder]
-) -> dict[str, Any]:
+def generate_integrated_fleet_report(
+        vehicles: List[Vehicle],
+        shipments: List[ShipmentOrder],
+        weather_evaluations: List[Dict[str, Any]]
+) -> Dict[str, Any]:
     total_vehicles = len(vehicles)
     if total_vehicles == 0:
         return {"status": "No vehicles available"}
 
     in_maintenance = sum(1 for v in vehicles if v.mechanical_status == "In Maintenance")
     active_vehicles = total_vehicles - in_maintenance
-    total_capacity = sum(v.max_weight_capacity for v in vehicles if v.mechanical_status == "OK")
+
+    standard_capacity = sum(v.max_weight_capacity for v in vehicles if v.mechanical_status == "OK")
+
+    weather_affected_shipments = 0
+    effective_capacity = standard_capacity
+
+    for eval_data in weather_evaluations:
+        if eval_data.get("windspeed", 0.0) > 35.0:
+            weather_affected_shipments += 1
+
+    if weather_affected_shipments > 0:
+        effective_capacity = standard_capacity * 0.8
+
     utilized_weight = sum(
-        s.total_weight for s in shipments if s.assigned_vehicle and s.assigned_vehicle.mechanical_status == "OK"
+        s.total_weight for s in shipments
+        if s.assigned_vehicle and s.assigned_vehicle.mechanical_status == "OK"
     )
-    utilization_rate = (utilized_weight / total_capacity * 100) if total_capacity > 0 else 0
+
+    utilization_rate = (utilized_weight / effective_capacity * 100) if effective_capacity > 0 else 0
 
     recommendation = "Fleet utilization is balanced and optimal."
     if utilization_rate > 85:
-        recommendation = "Warning: High fleet utilization (>85%). Consider expanding the fleet or leasing additional vehicles."
+        recommendation = "Warning: High fleet utilization. Consider expanding the fleet."
     elif in_maintenance / total_vehicles > 0.3:
-        recommendation = "Warning: High maintenance rate (>30%). Review vehicle health and mechanic availability."
+        recommendation = "Warning: High maintenance rate. Review vehicle health."
+
+    if weather_affected_shipments > 0:
+        recommendation += " Note: Weather conditions are reducing fleet safety capacity."
 
     return {
         "total_vehicles": total_vehicles,
         "active_vehicles": active_vehicles,
         "in_maintenance": in_maintenance,
-        "total_active_capacity_kg": total_capacity,
+        "standard_capacity_kg": standard_capacity,
+        "effective_weather_adjusted_capacity_kg": round(effective_capacity, 2),
+        "weather_affected_shipments_count": weather_affected_shipments,
         "current_utilized_weight_kg": round(utilized_weight, 2),
         "utilization_percentage": round(utilization_rate, 2),
         "strategic_recommendation": recommendation,
@@ -39,10 +60,10 @@ def generate_fleet_utilization_report(
 
 
 def detect_operational_anomalies(
-    shipments: list[ShipmentOrder],
-    valid_vehicles: list[Vehicle],
-    valid_drivers: list[Driver],
-) -> list[str]:
+        shipments: List[ShipmentOrder],
+        valid_vehicles: List[Vehicle],
+        valid_drivers: List[Driver],
+) -> List[str]:
     anomalies = []
     valid_vehicle_plates = {v.license_plate for v in valid_vehicles}
     valid_driver_ids = {d.driver_id for d in valid_drivers}
