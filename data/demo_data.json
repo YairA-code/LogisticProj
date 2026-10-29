@@ -1,0 +1,12 @@
+{
+    "order_id": "O1",
+    "parcels": [
+        {"id": "P1", "weight": 85.0, "destination": "Haifa"}
+    ],
+    "vehicle_plate": "11-222-33",
+    "vehicle_capacity": 100.0,
+    "driver_id": "D1",
+    "driver_name": "Yair",
+    "dest_lat": 32.79,
+    "dest_lon": 34.98
+}

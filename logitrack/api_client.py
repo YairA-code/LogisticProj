@@ -3,6 +3,8 @@ import time
 import logging
 from typing import Dict, Any
 
+from config import WEATHER_API_URL
+
 logger = logging.getLogger("logitrack.api_client")
 
 
@@ -10,7 +12,7 @@ class WeatherApiClient:
     def __init__(self, timeout: float = 5.0, max_retries: int = 3):
         self.timeout = timeout
         self.max_retries = max_retries
-        self.base_url = "https://api.open-meteo.com/v1/forecast"
+        self.base_url = WEATHER_API_URL
 
     def fetch_weather(self, latitude: float, longitude: float) -> Dict[str, Any]:
         params = {
