@@ -104,3 +104,40 @@ class WeatherDispatchService:
             pricing_strategy = NormalWeatherPricing()
             order.total_
 
+
+
+class WeatherShippingService:
+    def __init__(self, api_client=None, capacity_strategy=None, pricing_strategy=None):
+        self.api_client = api_client or WeatherApiClient()
+        self.capacity_strategy = capacity_strategy or WeatherAdjustedCapacityStrategy()
+        self.pricing_strategy = pricing_strategy or ExtremeWeatherPricingStrategy()
+        self._observers = []
+
+    def attach_observer(self, observer):
+        self._observers.append(observer)
+
+    def notify_observers(self, event_type: str, data: dict):
+        for obs in self._observers:
+            obs.update(event_type, data)
+
+    def evaluate_shipment(self, shipment, vehicle, latitude, longitude):
+        weather_data = self._fetch_weather_safe(latitude, longitude)
+        windspeed = weather_data.get("windspeed", 0.0)
+
+        effective_capacity = self.capacity_strategy.calculate_effective_capacity(vehicle, weather_data)
+        final_cost = self.pricing_strategy.calculate_final_cost(shipment.total_cost, weather_data)
+
+        if windspeed > 35.0:
+            self.notify_observers("HIGH_WIND_WARNING", {"vehicle": vehicle, "windspeed": windspeed})
+
+        is_weight_safe = shipment.total_weight <= effective_capacity
+
+        if not is_weight_safe:
+            self.notify_observers("DISPATCH_BLOCKED", {"order_id": shipment.order_id, "vehicle": vehicle})
+
+        return {
+            "order_id": shipment.order_id,
+            "final_cost": final_cost,
+            "effective_capacity": effective_capacity,
+            "is_weight_safe": is_weight_safe
+        }
