@@ -1,20 +1,16 @@
-import logging
-import time
 import requests
-from typing import Any, Dict
-
-try:
-    from config import MAX_RETRIES, REQUEST_TIMEOUT, RETRY_DELAY, WEATHER_API_URL
-except (ImportError, ValueError):
-    from config import MAX_RETRIES, REQUEST_TIMEOUT, RETRY_DELAY, WEATHER_API_URL
+import time
+import logging
+from typing import Dict, Any
 
 logger = logging.getLogger("logitrack.api_client")
 
 
 class WeatherApiClient:
-    def __init__(self, api_url: str = WEATHER_API_URL, timeout: float = REQUEST_TIMEOUT):
-        self.api_url = api_url
+    def __init__(self, timeout: float = 5.0, max_retries: int = 3):
         self.timeout = timeout
+        self.max_retries = max_retries
+        self.base_url = "https://api.open-meteo.com/v1/forecast"
 
     def fetch_weather(self, latitude: float, longitude: float) -> Dict[str, Any]:
         params = {
@@ -23,31 +19,25 @@ class WeatherApiClient:
             "current_weather": "true"
         }
 
-        last_exception = None
-        for attempt in range(1, MAX_RETRIES + 1):
+        attempt = 0
+        while attempt < self.max_retries:
             try:
-                logger.info(
-                    f"Fetching weather from API (Attempt {attempt}/{MAX_RETRIES}) for lat={latitude}, lon={longitude}")
-                response = requests.get(self.api_url, params=params, timeout=self.timeout)
+                response = requests.get(self.base_url, params=params, timeout=self.timeout)
                 response.raise_for_status()
+                return response.json()
 
-                data = response.json()
-                if "current_weather" not in data:
-                    raise ValueError("Invalid API response format: missing 'current_weather' field.")
+            except (requests.Timeout, requests.ConnectionError) as e:
+                attempt += 1
+                logger.warning(f"Connection failed. Attempt {attempt} of {self.max_retries}")
+                if attempt == self.max_retries:
+                    logger.error("Max retries reached. API unavailable.")
+                    raise ConnectionError("Weather API unavailable") from e
+                time.sleep(1.0)
 
-                return data
-
-            except (requests.Timeout, requests.ConnectionError) as err:
-                last_exception = err
-                logger.warning(f"Connection/Timeout error on attempt {attempt}: {err}")
-                if attempt < MAX_RETRIES:
-                    time.sleep(RETRY_DELAY * attempt)
-            except requests.HTTPError as err:
-                logger.error(f"HTTP error occurred: {err} (Status code: {err.response.status_code})")
-                raise
-            except (ValueError, KeyError) as err:
-                logger.error(f"Data validation or JSON decode error: {err}")
+            except requests.exceptions.HTTPError as e:
+                logger.error(f"HTTP Error: {e}")
                 raise
 
-        logger.error(f"Failed to fetch weather after {MAX_RETRIES} retries due to connection/timeout issues.")
-        raise ConnectionError(f"API unreachable after {MAX_RETRIES} attempts: {last_exception}")
+            except ValueError as e:
+                logger.error(f"Invalid JSON received: {e}")
+                raise
